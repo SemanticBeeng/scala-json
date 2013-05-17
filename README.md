@@ -4,6 +4,13 @@ The goal of this project is to try out ways to work with JSON data using Scala.
 
 	git clone git@github.com:oschrenk/scala-json.git
 	cd scala-json
+
+If you use Eclipse
+
+	make eclipse
+
+If you use IntelliJ IDEA
+
 	make idea
 
 ## JSON is an AST (Abstract Syntax Tree) ##

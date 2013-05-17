@@ -34,6 +34,20 @@ The [Play Framework](http://www.playframework.com/) introduced a new JSON API al
 
 For parsing it uses the Java based JSON library [Jackson](http://jackson.codehaus.org/)
 
+### Creating JSON ###
+
+`play-json` offers a straight forward API for creating JSON directly inside your code.
+
+	val js = Json.obj(
+	  "key1" -> "value1",
+	  "key2" -> 234,
+	  "key3" -> Json.obj(
+	    "key31" -> true,
+	    "key32" -> Json.arr("alpha", "beta", 234.13),
+	    "key33" -> Json.obj("key1" -> "value2", "key34" -> "value34")
+	  )
+	)
+
 ## Future ##
 
 - [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)

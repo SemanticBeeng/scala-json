@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import play.api.libs.json._
 import play.api.libs.json.JsString
 import play.api.libs.json.JsNumber
+import play.api.data.validation.ValidationError
 
 class PlayJsonTestSuite extends FunSuite {
 
@@ -63,5 +64,77 @@ class PlayJsonTestSuite extends FunSuite {
     val multiplePaths = (__ \\ "key1")(json)
     assert(multiplePaths === List(JsString("value1"), JsString("value2")))
   }
+
+  test("JSON reads success") {
+
+    val json = Json.obj(
+      "name" -> "gremlins",
+      "isDead" -> false,
+      "weight" -> 1.0F
+    )
+    val validatedCreature = json.validate[Creature]
+
+    val successCreature = JsSuccess(Creature("gremlins", false, 1.0F))
+
+    assert(validatedCreature === successCreature)
+  }
+
+  test("JSON reads fails with single validation error") {
+
+    val json = Json.obj(
+      "name" -> "gremlins",
+      "weight" -> 1.0F
+    )
+    val validatedCreature = json.validate[Creature]
+
+    val error = JsError(__ \ 'isDead, ValidationError("validate.error.missing-path"))
+
+    assert(validatedCreature === error)
+  }
+
+  test("Folding on successful JSON reads") {
+
+    val json = Json.obj(
+      "name" -> "gremlins",
+      "isDead" -> false,
+      "weight" -> 1.0F
+    )
+    val readSuccess: JsResult[Creature] = json.validate[Creature]
+
+    val foldResult = readSuccess.fold(
+      valid = {
+        c => c.name
+      },
+      invalid = {
+        e => e
+      }
+    )
+
+    assert(foldResult === "gremlins")
+  }
+
+  test("Folding on failed JSON reads") {
+
+    val json = Json.obj(
+      "name" -> "gremlins",
+      "weight" -> 1.0F
+    )
+    val readFailed: JsResult[Creature] = json.validate[Creature]
+
+    val foldResult = readFailed.fold(
+      valid = {
+        c => c.name
+      },
+      invalid = {
+        e => e
+      }
+    )
+
+    // its a list if tuples on a path with a corresponding list of validation errors)
+    val validationErrors = List((__ \ 'isDead, List(ValidationError("validate.error.missing-path"))))
+
+    assert(foldResult === validationErrors)
+  }
+
 
 }

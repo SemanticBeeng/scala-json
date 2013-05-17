@@ -82,9 +82,102 @@ If you are are interested in all instances of a key:
 
 - `(__ \\ "key1")(json)` results in `List(JsString("value1"), JsString("value2")))`
 
+### JSON Reads ###
+
+Mapping a Json structure to a case class
+
+	// if you need Json structures in your scope
+	import play.api.libs.json._
+	// IMPORTANT import this to have the required tools in your scope
+	import play.api.libs.functional.syntax._
+
+	case class Creature(name: String, isDead: Boolean, weight: Float)
+
+	object Creature {
+	implicit val creatureReads: Reads[Creature] = (
+	(__ \ "name").read[String] and
+	  (__ \ "isDead").read[Boolean] and
+	  (__ \ "weight").read[Float]
+	)(Creature.apply _)
+
+Woah. Breaking it down
+
+- `(__ \ "name")` is the JsPath where you gonna apply `read[String]`
+- `and` is just an operator meaning `Reads[A] and Reads[B] => Builder[Reads[A ~ B]]` where `~` is inspired by Scala parser combinators
+	- `A ~ B` just means `Combine A and B` but it doesn't suppose the way it is combined (can be a tuple, an object, whatever, ...)
+	- `Builder` is not a real type but I introduce it just to tell that the operator `and` doesn't create directly a `Reads[A ~ B]` but an intermediate structure that is able to build a `Reads[A ~ B]` or to combine with another `Reads[C]`
+- `(Creature.apply _)` build a `Reads[Creature]`
+
+#### Validating a `JSValue` ####
+
+There are three mechanisms to read a Json structure. The first one validates a `JsValue`
+
+1. `validate` returns a `JsResult`, which is either a `JsSuccess` or a `JsError` (which in turn is a wrapper for **all** validation errors)
+
+So now the preferred method to deal with a `JsValue` is to use `fold`:
+
+	val res: JsResult[Creature] = js.validate[Creature]
+
+	// managing the success/error and potentially return something
+	res.fold(
+	  valid = { c => println( c ); c.name },
+	  invalid = { e => println( e ); e }
+	)
+
+So in the case of a Play action you would do something like this
+
+	// a classic Play action
+	def getNameOnly = Action(parse.json) { request =>
+	  val json = request.body
+	  json.validate[Creature].fold(
+	    valid = ( res => Ok(res.name) ),
+	    invalid = ( e => BadRequest(e.toString) )
+	  )
+	}
+
+#### Under the hood ####
+
+There are now three mechanisms to read a Json structure
+
+	trait JsValue {
+	  def validate[T](implicit _reads: Reads[T]): JsResult[T] = _reads.reads(this)
+
+	  // same behavior but it throws a specific RuntimeException JsResultException now
+	  def as[T](implicit fjs: Reads[T]): T
+
+	  // exactly the same behavior has before
+	  def asOpt[T](implicit fjs: Reads[T]): Option[T]
+	}
+
+Remapping the type, wrapping it in a `JsResult`
+
+	trait Reads[A] {
+	  self : A =>
+	  // convert the JsValue into a A
+	  def reads(json: JsValue): JsResult[A]
+	}
+
+where `JsResult` can be of two types:
+
+- `JsSuccess[A]` when `reads` succeeds
+- `JsError[A]` when `reads` fails
+
+To create a JsError, there are a few helpers
+
+	val errors1 = JsError( __ \ 'isDead, ValidationError("validate.error.missing", "isDead") )
+	val errors2 = JsError( __ \ 'name, ValidationError("validate.error.missing", "name") )
+
+An advantage of `JsError` is that it's a cumulative error which can store several errors discovered in the Json at different `JsPath`s
+
+	scala> val errors = errors1 ++ errors2
+	errors: JsError(List((/isDead,List(ValidationError(validate.error.missing,WrappedArray(isDead)))), (/name,List(ValidationError(validate.error.missing,WrappedArray(name))))))
+
 ## Future ##
 
 - [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)
+- [An Introduction To Scala Parser Combinators - Part 1: Parser Basics](http://henkelmann.eu/2011/01/13/an_introduction_to_scala_parser_combinators)
+- [An Introduction To Scala Parser Combinators - Part 2: Parsing Literal Expressions](http://henkelmann.eu/2011/01/28/an_introduction_to_scala_parser_combinators-part_2_literal_expressions)
+- [An Introduction To Scala Parser Combinators - Part 3: Writing unit tests for parsers](http://henkelmann.eu/2011/01/29/an_introduction_to_scala_parser_combinators-part_3_unit_tests)
 
 ## Sources ##
 

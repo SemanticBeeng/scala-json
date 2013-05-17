@@ -1,7 +1,8 @@
-package typesafe
+package com.playframework.play21
 
 import org.scalatest.FunSuite
 import play.api.libs.json.Json
+import com.playframework.play21.{Koala, EucalyptusTree}
 
 class PlayJsonTestSuite extends FunSuite {
 

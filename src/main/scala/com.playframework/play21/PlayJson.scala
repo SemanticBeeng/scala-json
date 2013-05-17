@@ -1,4 +1,4 @@
-package typesafe
+package com.playframework.play21
 
 import play.api.libs.json._
 

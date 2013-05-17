@@ -48,6 +48,40 @@ For parsing it uses the Java based JSON library [Jackson](http://jackson.codehau
 	  )
 	)
 
+### Navigating JSON using JsPath ###
+
+You navigate JSON structures using the `JsPath` object, or preferably using its shorthand alias `__` (two underscores).
+
+There are two operators
+
+- `\` which returns the value of a specific key on the next level as a `List`
+- `\` which traverses the tree and returns the values for all instances of a specific key as a `List`
+
+Given the following `JsValue` as an example structure
+
+	 val json = Json.obj(
+      "key1" -> "value1",
+      "key2" -> 234,
+      "key3" -> Json.obj(
+        "key31" -> true,
+        "key32" -> Json.arr("alpha", "beta", 234.13),
+        "key33" -> Json.obj("key1" -> "value2", "key34" -> "value34")
+      )
+    )
+
+You can easily drill down the JSON structure:
+
+- `(__ \ "key1")(json)` results in `List(JsString("value1")))`
+- `(__ \ "key3" \ "key33")(json)` results `List(Json.obj("key1" -> "value2", "key34" -> "value34")))`
+
+You can specify the index of an array, so that
+
+- `(__ \ "key3" \ "key32")(2)(json)` results in `List(JsNumber(234.13)))`
+
+If you are are interested in all instances of a key:
+
+- `(__ \\ "key1")(json)` results in `List(JsString("value1"), JsString("value2")))`
+
 ## Future ##
 
 - [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)

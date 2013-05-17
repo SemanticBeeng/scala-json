@@ -27,6 +27,10 @@ The [Play Framework](http://www.playframework.com/) introduced a new JSON API al
 
 For parsing it uses the Java based JSON library [Jackson](http://jackson.codehaus.org/)
 
+## Future ##
+
+- [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)
+
 ## Sources ##
 
 - [The Play JSON library Basics](http://www.playframework.com/documentation/2.1.1/ScalaJson)

@@ -2,12 +2,11 @@ package com.playframework.play21
 
 import org.scalatest.FunSuite
 import play.api.libs.json.Json
-import com.playframework.play21.{Koala, EucalyptusTree}
 
 class PlayJsonTestSuite extends FunSuite {
 
   test("Object parsed from JSON equals directly created object") {
-    val createdKoala =  Koala("kaylee", EucalyptusTree(10, 23))
+    val createdKoala = Koala("kaylee", EucalyptusTree(10, 23))
     val parsedKoala = Json.fromJson[Koala](
       Json.obj(
         "name" -> "kaylee",
@@ -18,6 +17,6 @@ class PlayJsonTestSuite extends FunSuite {
       )
     ).get
 
-    assert ( createdKoala === parsedKoala )
+    assert(createdKoala === parsedKoala)
   }
 }

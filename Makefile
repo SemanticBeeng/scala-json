@@ -1,7 +1,7 @@
 compile:
-	./sbt.sh compile
+	./sbt.sh compile -feature
 test:
-	./sbt.sh test
+	./sbt.sh test -feature
 update:
 	./sbt.sh update
 idea:

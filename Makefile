@@ -2,6 +2,8 @@ compile:
 	./sbt.sh compile
 test:
 	./sbt.sh test
+update:
+	./sbt.sh update
 idea:
 	./sbt.sh gen-idea
 eclipse:

@@ -65,7 +65,7 @@ class PlayJsonTestSuite extends FunSuite {
     assert(multiplePaths === List(JsString("value1"), JsString("value2")))
   }
 
-  test("JSON reads success") {
+  test("JSON reads success for creature") {
 
     val json = Json.obj(
       "name" -> "gremlins",
@@ -79,7 +79,7 @@ class PlayJsonTestSuite extends FunSuite {
     assert(validatedCreature === successCreature)
   }
 
-  test("JSON reads fails with single validation error") {
+  test("JSON reads fails with single validation error for creature") {
 
     val json = Json.obj(
       "name" -> "gremlins",
@@ -92,7 +92,7 @@ class PlayJsonTestSuite extends FunSuite {
     assert(validatedCreature === error)
   }
 
-  test("Folding on successful JSON reads") {
+  test("Folding on successful JSON reads for creature") {
 
     val json = Json.obj(
       "name" -> "gremlins",
@@ -113,7 +113,7 @@ class PlayJsonTestSuite extends FunSuite {
     assert(foldResult === "gremlins")
   }
 
-  test("Folding on failed JSON reads") {
+  test("Folding on failed JSON reads for creature") {
 
     val json = Json.obj(
       "name" -> "gremlins",
@@ -136,5 +136,67 @@ class PlayJsonTestSuite extends FunSuite {
     assert(foldResult === validationErrors)
   }
 
+  test("Read single complex creature successfully") {
+
+    val gizmoJson = Json.obj(
+      "name" -> "gremlins",
+      "isDead" -> false,
+      "weight" -> 1.0F,
+      "email" -> "gizmo@midnight.com",
+      "favorites" -> Json.obj("string" -> "alpha", "number" -> 85),
+      "friends" -> Json.arr(),
+      "social" -> "@gizmo"
+    )
+    val gizmoCreature = gizmoJson.validate[ComplexCreature]
+
+    gizmoCreature match {
+      case s: JsSuccess[ComplexCreature] =>assert(true)
+      case _ => fail("should be JsSuccess")
+    }
+  }
+
+  test("Read recursive complex creature successfully") {
+
+    val gizmoJson = Json.obj(
+      "name" -> "gremlins",
+      "isDead" -> false,
+      "weight" -> 1.0F,
+      "email" -> "gizmo@midnight.com",
+      "favorites" -> Json.obj("string" -> "alpha", "number" -> 85),
+      "friends" -> Json.arr(),
+      "social" -> "@gizmo"
+    )
+
+    val shaunJson = Json.obj(
+      "name" -> "zombie",
+      "isDead" -> true,
+      "weight" -> 100.0F,
+      "email" -> "shaun@dead.com",
+      "favorites" -> Json.obj("string" -> "brain", "number" -> 2),
+      "friends" -> Json.arr( gizmoJson))
+    val shaunCreature = shaunJson.validate[ComplexCreature]
+
+    shaunCreature match {
+      case s: JsSuccess[ComplexCreature] => assert(true)
+      case _ => fail("should be JsSuccess")
+    }
+  }
+
+  test("Fail to read complex creature with 'ni' as a favorite") {
+
+    val niJson = Json.obj(
+      "name" -> "gremlins",
+      "isDead" -> false,
+      "weight" -> 1.0F,
+      "email" -> "ni@midnight.com",
+      "favorites" -> Json.obj("string" -> "ni", "number" -> 500),
+      "friends" -> Json.arr()
+    )
+
+    niJson.validate[ComplexCreature] match {
+      case s: JsError => assert(true)
+      case _ => fail("should be JsError")
+    }
+  }
 
 }

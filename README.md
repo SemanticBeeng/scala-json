@@ -100,13 +100,74 @@ Mapping a Json structure to a case class
 	  (__ \ "weight").read[Float]
 	)(Creature.apply _)
 
-Woah. Breaking it down
+Let's break this down
 
 - `(__ \ "name")` is the JsPath where you gonna apply `read[String]`
 - `and` is just an operator meaning `Reads[A] and Reads[B] => Builder[Reads[A ~ B]]` where `~` is inspired by Scala parser combinators
 	- `A ~ B` just means `Combine A and B` but it doesn't suppose the way it is combined (can be a tuple, an object, whatever, ...)
 	- `Builder` is not a real type but I introduce it just to tell that the operator `and` doesn't create directly a `Reads[A ~ B]` but an intermediate structure that is able to build a `Reads[A ~ B]` or to combine with another `Reads[C]`
 - `(Creature.apply _)` build a `Reads[Creature]`
+
+#### Reads for complex structures ####
+
+Let's imagine a complex creature:
+
+- it's relatively modern creature that has an email address but hates email addresses with less than 5 characters
+- may have 2 favorites data:
+	- 1 String (called `string` in JSON) which shall not be `ni` (because it loves Monty Python) and then to skip the first 2 chars
+	- 1 Int (called `number` in JSON) which can be less than `86` or more than `875`
+- may have friend creatures
+- may have an social account
+
+So something like this:
+
+	case class Creature(
+	  name: String,
+	  isDead: Boolean,
+	  weight: Float,
+	  email: String, // email format and minLength(5)
+	  favorites: (String, Int), // the stupid favorites
+	  friends: List[Creature] = Nil, // yes by default it has no friend
+	  social: Option[String] = None // by default, it's not social
+	)
+
+The reads function can be realized like this
+
+	implicit val creatureReads: Reads[Creature] = (
+	  (__ \ "name").read[String] and
+	  (__ \ "isDead").read[Boolean] and
+	  (__ \ "weight").read[Float] and
+	  (__ \ "email").read(email keepAnd minLength[String](5)) and
+	  (__ \ "favorites").read(
+	      (__ \ "string").read[String]( notEqualReads("ni") andKeep skipReads ) and
+	      (__ \ "number").read[Int]( max(86) or min(875) )
+	      tupled
+	  ) and
+	  (__ \ "friends").lazyRead( list[Creature](creatureReads) ) and
+	  (__ \ "social").readOpt[String]
+	)(Creature)
+
+Let's break this down
+
+- `(__ \ "email").read(email keepAnd minLength[String](5))`
+	- `(__ \ "email").read(...)` gets the `JsPath`
+	- `email keepAnd minLength[String](5) => Reads[String]` is a `Js` validator that verifies JsValue:
+		1. is a String : `email: Reads[String]` so no need to specify type here
+		2. has email format
+		3. has min length of 5
+	- The `keepAnd` operator (aka`<~`) validates both sides but if succeeded, it keeps only the result on left side.
+- `notEqualReads("ni") andKeep skipReads`
+	- No need to write `notEqualReads[String]("ni")` because `String` type is inferred
+	- `skipReads` is a customReads that skips the first 2 chars
+	- `andKeep` operator (aka `~>`) validates the left and right side and if both succeed, only keeps the result on right side.
+- `max(86) or min(875)`
+	- the classic `OR` logic operator
+- `tupled`
+	 - `tuplizes` your Builder: `Builder[Reads[(A, B)]].tupled => Reads[(A, B)]`
+- `(__ \ "friend").lazyRead( list[Creature](creatureReads) )`
+	- `lazyRead` expects a `Reads[A]` value _passed by name_ to allow the type recursive construction
+- `(__ \ "social").readOpt[String]`
+	- read an `Option`
 
 #### Validating a `JSValue` ####
 

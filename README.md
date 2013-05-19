@@ -84,7 +84,7 @@ If you are are interested in all instances of a key:
 
 ### JSON Reads ###
 
-Mapping a Json structure to a case class
+Unmarshalling a Json structure to a case class
 
 	// if you need Json structures in your scope
 	import play.api.libs.json._
@@ -288,6 +288,26 @@ There is only one interesting tidbit:
 
 - `(__ \ "friend").lazyWrite(Writes.traversableWrites[Creature](creatureWrites))`
 	- It’s the symmetric code for `lazyRead´ to treat recursive field on Creature class itself
+
+### Mapping JSON, `Reads` and `Writes` in one `Format` step ###
+
+Having separate Reads and Writes functions, that basically do the same feels awkward. Luckily you can only create `Formats` which offer a basic API for both marshaling and unmarshaling in one step. Play2.1 also provides Format Combinators:
+
+	implicit val creatureFormat = (
+	  (__ \ "name").format[String] and
+	  (__ \ "isDead").format[Boolean] and
+	  (__ \ "weight").format[Float]
+	)(Creature.apply, unlift(Creature.unapply))
+
+Nothing surprising here. The last line just provides both the proper `Reads` and the `Writes` signature.
+
+Unfortunately this only works for the most simplest of cases. If you want to do some validation on the `Reads` or something more complicated like recursive reading or writing using `lazyRead` or `lazyWrite` you can't use `Format` combinators, as the underlying `Reads` and `Writes` lose their symmetry.
+
+As a second option you could create an implicit Format
+
+	implicit val creatureFormat = Format(creatureReads, creatureWrites)
+
+but then you have to drop the implicit keyword from the used `Reads` and `Writes`
 
 ## Future ##
 

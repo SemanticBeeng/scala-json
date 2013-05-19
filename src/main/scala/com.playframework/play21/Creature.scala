@@ -13,7 +13,6 @@ object Creature {
     (__ \ "weight").read[Float]
   )(Creature.apply _)
 
-  // or using the operators inspired by Scala parser combinators for those who know them
   implicit val creatureWrites = (
     (__ \ "name").write[String] and
     (__ \ "isDead").write[Boolean] and

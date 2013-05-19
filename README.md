@@ -233,6 +233,62 @@ An advantage of `JsError` is that it's a cumulative error which can store severa
 	scala> val errors = errors1 ++ errors2
 	errors: JsError(List((/isDead,List(ValidationError(validate.error.missing,WrappedArray(isDead)))), (/name,List(ValidationError(validate.error.missing,WrappedArray(name))))))
 
+### JSON writes ###
+
+To marshall objects you use `Write` combinators that resemble the `Reads` API.
+
+	import play.api.libs.json.Writes._
+
+	implicit val creatureWrites = (
+	  (__ \ "name").write[String] and
+	  (__ \ "isDead").write[Boolean] and
+	  (__ \ "weight").write[Float]
+	)(unlift(Creature.unapply))
+
+The only interesting thing is the `unlift` call.
+
+- `(unlift(Creature.unapply))` builds a `Writes[Creature]`
+	- `(__ \ "name").write[String]` and `(__ \ "isDead").write[Boolean]` and `(__ \ "weight").write[Float]` builds a `Builder[Writes[String ~ Boolean ~ Float])]` but you want a `Writes[Creature]`.
+	- So you apply the `Builder[Writes[String ~ Boolean ~ String])]` to a function `Creature => (String, Boolean, Float)` to finally obtain a `Writes[Creature]`. Please note that it may seem a bit strange to provide `Creature => (String, Boolean, Float)` to obtain a `Writes[Creature]` from a `Builder[Writes[String ~ Boolean ~ String])]` but it's due to the contravariant nature of `Writes[-T]`.
+	- We have `Creature.unapply` but its signature is `Creature => Option[(String, Boolean, Float)]` so we `unlift` it to obtain `Creature => (String, Boolean, Float)`.
+
+Writing is easier as there is nothing to validate.
+
+#### More complex Writes ####
+
+Given the example that was given for the reads:
+
+	case class Creature(
+	  name: String,
+	  isDead: Boolean,
+	  weight: Float,
+	  email: String, // email format and minLength(5)
+	  favorites: (String, Int), // the stupid favorites
+	  friends: List[Creature] = Nil, // yes by default it has no friend
+	  social: Option[String] = None // by default, it's not social
+	)
+
+You would write writes like this:
+
+	implicit val creatureWrites: Writes[Creature] = (
+	  (__ \ "name").write[String] and
+	  (__ \ "isDead").write[Boolean] and
+	  (__ \ "weight").write[Float] and
+	  (__ \ "email").write[String] and
+	  (__ \ "favorites").write(
+	      (__ \ "string").write[String] and
+	      (__ \ "number").write[Int]
+	      tupled
+	  ) and
+	  (__ \ "friends").lazyWrite(Writes.traversableWrites[Creature](creatureWrites)) and
+	  (__ \ "social").write[Option[String]]
+	)(unlift(Creature.unapply))
+
+There is only one interesting tidbit:
+
+- `(__ \ "friend").lazyWrite(Writes.traversableWrites[Creature](creatureWrites))`
+	- It’s the symmetric code for `lazyRead´ to treat recursive field on Creature class itself
+
 ## Future ##
 
 - [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)

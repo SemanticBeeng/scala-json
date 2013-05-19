@@ -319,6 +319,7 @@ but then you have to drop the implicit keyword from the used `Reads` and `Writes
 ## Sources ##
 
 - [The Play JSON library Basics](http://www.playframework.com/documentation/2.1.1/ScalaJson)
+- [Playing With Play2 SCALA JSON API Stand-alone](http://mandubian.com/2013/02/21/play-json-stand-alone/)
 - [Unveiling Play 2.1 Json API - Part 1 : JsPath & Reads Combinators](http://mandubian.com/2012/09/08/unveiling-play-2-dot-1-json-api-part1-jspath-reads-combinators/)
 - [Unveiling Play 2.1 Json API - Part 2 : Writes/Format Combinators](http://mandubian.com/2012/10/01/unveiling-play-2-dot-1-json-api-part2-writes-format-combinators/)
 - [Unveiling Play 2.1 Json API - Part 3 : JSON Transformers](http://mandubian.com/2012/10/29/unveiling-play-2-dot-1-json-api-part3-json-transformers/)

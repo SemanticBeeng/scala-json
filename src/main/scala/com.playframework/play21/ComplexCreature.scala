@@ -35,7 +35,7 @@ object ComplexCreature {
       (__ \ "social").readNullable[String]
   )(ComplexCreature.apply _)
 
-  implicit val creatureWrites: Writes[ComplexCreature] = (
+  implicit val complexCreatureWrites: Writes[ComplexCreature] = (
     (__ \ "name").write[String] and
     (__ \ "isDead").write[Boolean] and
     (__ \ "weight").write[Float] and
@@ -44,7 +44,7 @@ object ComplexCreature {
       (__ \ "string").write[String] and
         (__ \ "number").write[Int] tupled
     ) and
-      (__ \ "friends").lazyWrite(Writes.traversableWrites[ComplexCreature](creatureWrites)) and
+      (__ \ "friends").lazyWrite(Writes.traversableWrites[ComplexCreature](complexCreatureWrites)) and
       (__ \ "social").writeOpt[String]
   )(unlift(ComplexCreature.unapply))
 

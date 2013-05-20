@@ -11,5 +11,5 @@ eclipse:
 clean:
 	rm -rf .idea
 	rm -rf .idea_modules
-	rm -rf project
+	rm -rf project/target
 	rm -rf target

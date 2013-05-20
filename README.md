@@ -309,6 +309,89 @@ As a second option you could create an implicit Format
 
 but then you have to drop the implicit keyword from the used `Reads` and `Writes`
 
+### Transformers ###
+
+You can use transformers to transform a JSON structure directly to another JSON structure.
+
+Imagine the following example structure:
+
+	val json = Json.obj(
+	    "key1" -> "value1",
+	    "key2" -> Json.obj(
+	      "key21" -> 123,
+	      "key22" -> true,
+	      "key23" -> Json.arr("alpha", "beta", "gamma"),
+	      "key24" -> Json.obj(
+	        "key241" -> 234.123,
+	        "key242" -> "value242"
+	      )
+	    ),
+	    "key3" -> 234
+	)
+
+There a few transformer strategies you can use.
+
+- **`pick`** Pick JSON value in the given JsPath.
+
+		val jsonTransformer = (__ \ 'key2 \ 'key23).json.pick
+	    json.validate(jsonTransformer)
+	    // JsSuccess(Json.arr("alpha", "beta", "gamma"), (__ \ 'key2 \ 'key23))
+- **`pickBranch`** Picks the branch from root to given JsPath including the JsValue in JsPath
+
+		val jsonTransformer = (__ \ 'key2 \ 'key24 \ 'key241).json.pickBranch
+		json.validate(jsonTransformer).get
+		// Json.obj("key2" -> Json.obj("key24" -> Json.obj("key241" -> JsNumber(234.123))))
+
+- **`put`** Put a given value in a new branch.
+
+		val jsonTransformer = (__ \ 'key24 \ 'key241).json.put(JsNumber(456))
+	    json.validate(jsonTransformer)
+	    // JsSuccess(Json.obj("key24" -> Json.obj("key241" -> JsNumber(456))))
+
+- **`copyFrom`** Copy a value from input JsPath into a new JsPath.
+
+		val jsonTransformer = (__ \ 'key25 \ 'key251).json.copyFrom((__ \ 'key2 \ 'key21).json.pick)
+	    json.validate(jsonTransformer)
+	    // JsSuccess(Json.obj("key25" -> Json.obj("key251" -> JsNumber(123))), (__ \ 'key2 \ 'key21))
+
+- **`update`** Does 3 things. It extracts value from input JSON at the given `JsPath`, applies reads on this relative value and re-creates a branch the branch adding result of reads as leaf, and merges this branch with full input JSON replacing existing branch (so it works only with input JsObject and not other type of JsValue)
+
+		val jsonTransformer = (__ \ 'key2 \ 'key24).json.update(
+	      __.read[JsObject].map { o => o ++ Json.obj("field243" -> "coucou") }
+	    )
+	    json.validate(jsonTransformer)
+	    /* Json.obj(
+	      "key1" -> "value1",
+	      "key2" -> Json.obj(
+	        "key21" -> 123,
+	        "key22" -> true,
+	        "key23" -> Json.arr("alpha", "beta", "gamma"),
+	        "key24" -> Json.obj(
+	          "key241" -> 234.123,
+	          "key242" -> "value242",
+	          "field243" -> "coucou"
+	        )
+	      ),
+	      "key3" -> 234
+	    ) */
+
+- **`prune`** Prune a branch from input JSON (Please note the resulting JsObject hasn’t same keys order as input JsObject). Only works with JsObject.
+
+		val jsonTransformer = (__ \ 'key2 \ 'key22).json.prune
+	    json.validate(jsonTransformer)
+	    /* Json.obj(
+	      "key1" -> "value1",
+	      "key2" -> Json.obj(
+	        "key21" -> 123,
+	        "key23" -> Json.arr("alpha", "beta", "gamma"),
+	        "key24" -> Json.obj(
+	          "key241" -> 234.123,
+	          "key242" -> "value242"
+	        )
+	      ),
+	      "key3" -> 234
+	    ) */
+
 ## Future ##
 
 - [JsZipper : Play2 Json Advanced (& Monadic) Manipulations](http://mandubian.com/2013/05/01/JsZipper/)

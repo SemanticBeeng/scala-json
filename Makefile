@@ -9,7 +9,10 @@ idea:
 eclipse:
 	./sbt.sh eclipse
 clean:
+	rm -f .cache
+	rm -f .classpath
 	rm -rf .idea
 	rm -rf .idea_modules
+	rm -f .project
 	rm -rf project/target
 	rm -rf target

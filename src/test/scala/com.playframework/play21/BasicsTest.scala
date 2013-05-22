@@ -2,9 +2,6 @@ package com.playframework.play21
 
 import org.scalatest.FunSuite
 import play.api.libs.json._
-import play.api.libs.json.JsString
-import play.api.libs.json.JsNumber
-import play.api.data.validation.ValidationError
 
 class PlayJsonTestSuite extends FunSuite {
 

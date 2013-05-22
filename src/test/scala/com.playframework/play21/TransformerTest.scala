@@ -41,7 +41,9 @@ class TransformerTestSuite extends FunSuite {
 
   test("Copy full input Json & update a branch") {
     val jsonTransformer = (__ \ 'key2 \ 'key24).json.update(
-      __.read[JsObject].map { o => o ++ Json.obj("field243" -> "coucou") }
+      __.read[JsObject].map {
+        o => o ++ Json.obj("field243" -> "coucou")
+      }
     )
     val actualResult = json.validate(jsonTransformer)
     val expectedJson = Json.obj(
@@ -95,10 +97,14 @@ class TransformerTestSuite extends FunSuite {
   test("Pick a branch and update its content in 2 places") {
     val jsonTransformer = (__ \ 'key2).json.pickBranch(
       (__ \ 'key21).json.update(
-        of[JsNumber].map { case JsNumber(nb) => JsNumber(nb + 10) }
+        of[JsNumber].map {
+          case JsNumber(nb) => JsNumber(nb + 10)
+        }
       ) andThen
         (__ \ 'key23).json.update(
-          of[JsArray].map { case JsArray(arr) => JsArray(arr :+ JsString("delta")) }
+          of[JsArray].map {
+            case JsArray(arr) => JsArray(arr :+ JsString("delta"))
+          }
         )
     )
     val actualResult = json.validate(jsonTransformer)
@@ -137,7 +143,7 @@ class TransformerTestSuite extends FunSuite {
     assert(actualResult === expectedResult)
   }
 
-   test("Convert Gizmo to Gremlin") {
+  test("Convert Gizmo to Gremlin") {
     val gizmo = Json.obj(
       "name" -> "gizmo",
       "description" -> Json.obj(
@@ -154,13 +160,15 @@ class TransformerTestSuite extends FunSuite {
     )
     val gizmo2gremlin = (
       (__ \ 'name).json.put(JsString("gremlin")) and
-      (__ \ 'description).json.pickBranch(
-        (__ \ 'size).json.update(of[JsNumber].map { case JsNumber(size) => JsNumber(size * 3) }) and
-          (__ \ 'features).json.put(Json.arr("skinny", "ugly", "evil")) and
-          (__ \ 'danger).json.put(JsString("always")) reduce
-      ) and
+        (__ \ 'description).json.pickBranch(
+          (__ \ 'size).json.update(of[JsNumber].map {
+            case JsNumber(size) => JsNumber(size * 3)
+          }) and
+            (__ \ 'features).json.put(Json.arr("skinny", "ugly", "evil")) and
+            (__ \ 'danger).json.put(JsString("always")) reduce
+        ) and
         (__ \ 'hates).json.copyFrom((__ \ 'loves).json.pick)
-    ) reduce
+      ) reduce
     val actualResult = gizmo.validate(gizmo2gremlin)
     val expectedResult = JsSuccess(Json.obj(
       "name" -> "gremlin",

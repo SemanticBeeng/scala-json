@@ -5,7 +5,10 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
 
-class CreditCard {
+case class CreditCard(service: String, number: String, security: String)
+
+
+object CreditCard {
 
   def luhnTest(number: String): Boolean = {
     val digits = number.reverse.map {
@@ -17,8 +20,6 @@ class CreditCard {
     }
     s.sum % 10 == 0
   }
-
-  case class CreditCard(service: String, number: String, security: String)
 
   def creditCardNumberReads(implicit r: Reads[String]): Reads[String] = Reads.filter(ValidationError("validate.error.luhn-test"))(luhnTest(_))
 

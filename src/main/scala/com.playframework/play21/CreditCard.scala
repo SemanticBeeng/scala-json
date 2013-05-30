@@ -26,7 +26,7 @@ object CreditCard {
   implicit val paymentReads: Reads[CreditCard] = (
     (__ \ 'service).read[String](minLength[String](4)) and
       (__ \ 'number).read[String](creditCardNumberReads) and
-      (__ \ 'security).read[String](minLength[String](4))
+      (__ \ 'security).read[String](minLength[String](3))
     )(CreditCard.apply _)
 
 }

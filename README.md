@@ -34,11 +34,17 @@ The [Play Framework](http://www.playframework.com/) introduced a new JSON API al
 
 For parsing it uses the Java based JSON library [Jackson](http://jackson.codehaus.org/)
 
+### Parsing JSON ###
+
+You can easily parse any JSON string as a JsValue:
+
+	val json: JsValue = Json.parse(jsonString)
+
 ### Creating JSON ###
 
 `play-json` offers a straight forward API for creating JSON directly inside your code.
 
-	val js = Json.obj(
+	val json = Json.obj(
 	  "key1" -> "value1",
 	  "key2" -> 234,
 	  "key3" -> Json.obj(

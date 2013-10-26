@@ -8,9 +8,9 @@ scalaVersion := "2.10.3"
 
 
 resolvers  ++= Seq(
-	// Mandubian repos for standalone play-json
 	"Mandubian repository releases" at "https://github.com/mandubian/mandubian-mvn/raw/master/releases/",
-	"Mandubian repository snapshots" at "https://github.com/mandubian/mandubian-mvn/raw/master/snapshots/"
+	"Mandubian repository snapshots" at "https://github.com/mandubian/mandubian-mvn/raw/master/snapshots/",
+	"Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
 )
 
 libraryDependencies ++= Seq(

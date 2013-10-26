@@ -1,13 +1,19 @@
+.PHONY: sbt
+
 compile:
-	./sbt.sh compile -feature -deprecation
+	./sbt compile
 test:
-	./sbt.sh test -feature -deprecation
+	./sbt test
 update:
-	./sbt.sh update
+	./sbt update
 idea:
-	./sbt.sh gen-idea
+	./sbt gen-idea
 eclipse:
-	./sbt.sh eclipse
+	./sbt eclipse
+sbt:
+	rm -rf sbt
+	wget https://raw.github.com/paulp/sbt-extras/master/sbt
+	chmod u+x sbt
 clean:
 	rm -f .cache
 	rm -f .classpath

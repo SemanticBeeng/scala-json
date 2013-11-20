@@ -7,7 +7,6 @@ import play.api.data.validation.ValidationError
 
 case class CreditCard(service: String, number: String, security: String)
 
-
 object CreditCard {
 
   def luhnTest(number: String): Boolean = {
@@ -23,10 +22,37 @@ object CreditCard {
 
   def creditCardNumberReads(implicit r: Reads[String]): Reads[String] = Reads.filter(ValidationError("validate.error.luhn-test"))(luhnTest(_))
 
+  implicit val securityCodeLengthReads = new Reads[String] {
+    def lengthOfSecurityCode(number: String): Int = {
+      number match {
+        // American Express
+      case n if n.startsWith("34") => 4
+      case n if n.startsWith("37") => 4
+
+      // All other issuers
+      case _ => 3
+      }
+    }
+
+    def reads(js:JsValue):JsResult[String] = {
+      val number = (js \ "number").as[String].trim
+      val cvv = (js \ "security").as[String].trim
+
+      val expectedLength = lengthOfSecurityCode(number)
+      val actualLength = cvv.length
+
+      if(expectedLength == actualLength) {
+        JsSuccess(cvv)
+      } else {
+        JsError(s"Invalid security code length")
+      }
+    }
+  }
+
   implicit val paymentReads: Reads[CreditCard] = (
     (__ \ 'service).read[String](minLength[String](4)) and
       (__ \ 'number).read[String](creditCardNumberReads) and
-      (__ \ 'security).read[String](minLength[String](3))
+      __.read(securityCodeLengthReads)
     )(CreditCard.apply _)
 
 }

@@ -5,6 +5,14 @@ package com.misc.ex1
  */
 object ImplicitTest extends App {
 
+  abstract class SemiGroup[A] {
+    def add(x: A, y: A): A
+  }
+
+  abstract class Monoid[A] extends SemiGroup[A] {
+    def unit: A
+  }
+
   implicit object StringMonoid extends Monoid[String] {
     def add(x: String, y: String): String = x concat y
 

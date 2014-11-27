@@ -1,7 +1,7 @@
 package com.playframework.play21
 
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 case class Creature(name: String, isDead: Boolean, weight: Float)
 

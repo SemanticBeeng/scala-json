@@ -1,9 +1,9 @@
 package com.playframework.play21
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
 import play.api.data.validation.ValidationError
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json._
 
 case class ComplexCreature(
   name: String,
@@ -45,7 +45,7 @@ object ComplexCreature {
         (__ \ "number").write[Int] tupled
     ) and
       (__ \ "friends").lazyWrite(Writes.traversableWrites[ComplexCreature](complexCreatureWrites)) and
-      (__ \ "social").writeOpt[String]
+      (__ \ "social").writeNullable[String]
   )(unlift(ComplexCreature.unapply))
 
 }

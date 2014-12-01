@@ -5,6 +5,13 @@ import play.api.libs.json._
 
 class PlayJsonTestSuite extends FunSuite {
 
+
+  test("subtraction") {
+    val diff = 4 - 1
+    assert(diff === 3)
+    assert(diff - 2 === 1)
+  }
+
   test("Object parsed from JSON equals directly created object") {
     val createdKoala = Koala("kaylee", EucalyptusTree(10, 23))
     val parsedKoala = Json.fromJson[Koala](

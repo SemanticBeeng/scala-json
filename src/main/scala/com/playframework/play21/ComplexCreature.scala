@@ -32,7 +32,7 @@ object ComplexCreature {
         (__ \ "number").read[Int](max(86) or min(875)) tupled
     ) and
       (__ \ "friends").lazyRead(list[ComplexCreature](complexCreatureReads)) and
-      (__ \ "social").readNullable[String]
+      (__ \ "social").readNullable[String] //@todo readOpt??
   )(ComplexCreature.apply _)
 
   implicit val complexCreatureWrites: Writes[ComplexCreature] = (
@@ -45,7 +45,7 @@ object ComplexCreature {
         (__ \ "number").write[Int] tupled
     ) and
       (__ \ "friends").lazyWrite(Writes.traversableWrites[ComplexCreature](complexCreatureWrites)) and
-      (__ \ "social").writeNullable[String]
+      (__ \ "social").writeNullable[String] //@todo writeOpt??
   )(unlift(ComplexCreature.unapply))
 
 }

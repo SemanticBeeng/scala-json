@@ -1,9 +1,9 @@
 package com.playframework.play21
 
 import org.scalatest.FunSuite
-import play.api.libs.json.{JsSuccess, JsError, Json}
+import play.api.libs.json.{JsResult, JsSuccess, JsError, Json}
 
-class CreditCardTest extends FunSuite{
+class CreditCardTest extends FunSuite {
 
   val Visa = "visa"
   val validVisa = "4111111111111111"
@@ -16,6 +16,7 @@ class CreditCardTest extends FunSuite{
   val AmericanEXpress = "american-express"
   val validAmericanExpress = "378161408561557"
   val invalidAmericanExpress = "378161408561558"
+/*
 
   test("Luhn test succeeds on valid mastercard number") {
     assert(CreditCard.luhnTest(validMastercard) === true)
@@ -40,23 +41,25 @@ class CreditCardTest extends FunSuite{
   test("Luhn test fails on invalid American Express number") {
     assert(CreditCard.luhnTest(invalidAmericanExpress) === false)
   }
+*/
 
   test("Parse a valid visa card") {
-    val createdCreditCard = CreditCard(Visa, validVisa, "111" )
+    val createdCreditCard = CreditCard(Visa, validVisa, "111")
     val parsedCreditCard = Json.fromJson[CreditCard](
       Json.obj(
         "service" -> "visa",
         "number" -> validVisa,
         "security" -> "111"
-        )
+      )
     )
     println(parsedCreditCard)
 
     assert(createdCreditCard === parsedCreditCard.get)
   }
 
+/*
   test("Parse a valid American Express card with four digit pin") {
-    val createdCreditCard = CreditCard(AmericanEXpress, validAmericanExpress, "1111" )
+    val createdCreditCard = CreditCard(AmericanEXpress, validAmericanExpress, "1111")
     val parsedCreditCard = Json.fromJson[CreditCard](
       Json.obj(
         "service" -> AmericanEXpress,
@@ -70,20 +73,22 @@ class CreditCardTest extends FunSuite{
   }
 
   test("Fail on valid American Express card with three digit pin") {
-    Json.fromJson[CreditCard](
+
+    val result: JsResult[CreditCard] = Json.fromJson[CreditCard](
       Json.obj(
         "service" -> AmericanEXpress,
         "number" -> validAmericanExpress,
         "security" -> "111"
       )
-    ) match {
-      case JsSuccess(_,_) => fail()
+    )
+    result match {
+      case JsSuccess(_, _) => fail()
       case JsError(_) => println("passed")
     }
   }
 
   test("Parse a valid Mastercard card") {
-    val createdCreditCard = CreditCard(Mastercard, validMastercard, "111" )
+    val createdCreditCard = CreditCard(Mastercard, validMastercard, "111")
     val parsedCreditCard = Json.fromJson[CreditCard](
       Json.obj(
         "service" -> Mastercard,
@@ -104,7 +109,7 @@ class CreditCardTest extends FunSuite{
         "security" -> "111"
       )
     ) match {
-      case JsSuccess(_,_) => fail()
+      case JsSuccess(_, _) => fail()
       case JsError(_) => println("passed")
     }
   }
@@ -117,10 +122,11 @@ class CreditCardTest extends FunSuite{
         "security" -> "111"
       )
     ) match {
-      case JsSuccess(_,_) => fail()
+      case JsSuccess(_, _) => fail()
       case JsError(_) => println("passed")
     }
   }
 
+*/
 
 }

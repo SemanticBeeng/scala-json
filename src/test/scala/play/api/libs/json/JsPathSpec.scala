@@ -3,6 +3,9 @@
  */
 package play.api.libs.json
 
+import org.junit.runner._
+import org.specs2.runner._
+
 import org.specs2.mutable._
 import play.api.libs.json._
 import play.api.libs.json.Json._
@@ -12,6 +15,7 @@ import java.text.ParseException
 
 import play.api.data.validation.ValidationError
 
+@RunWith(classOf[JUnitRunner])
 object JsPathSpec extends Specification {
 
   "JsPath" should {

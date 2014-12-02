@@ -3,7 +3,9 @@
  */
 package play.api.libs.json
 
+import org.junit.runner.RunWith
 import org.specs2.mutable._
+import org.specs2.runner.JUnitRunner
 import play.api.libs.json._
 import play.api.libs.json.Json._
 
@@ -47,12 +49,12 @@ object Person {
   implicit val personWrites = Json.writes[Person]
 }
 
-package foreign {
+//package foreign {
   case class Foreigner(name: String)
-}
+//}
 object ForeignTest {
-  implicit val foreignerReads = Json.reads[foreign.Foreigner]
-  implicit val foreignerWrites = Json.writes[foreign.Foreigner]
+  implicit val foreignerReads = Json.reads[/*foreign.*/Foreigner]
+  implicit val foreignerWrites = Json.writes[/*foreign.*/Foreigner]
 }
 
 import play.api.libs.json._
@@ -63,6 +65,7 @@ object Person2 {
   implicit val person2Fmt = Json.format[Person2]
 }
 
+@RunWith(classOf[JUnitRunner])
 object JsonExtensionSpec extends Specification {
 
   "JsonExtension" should {

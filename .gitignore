@@ -1,5 +1,13 @@
 target
 project/project
 project/target
+project/.ivy
+project/.boot
 sbt
 .idea
+.idea_modules
+.cache
+.classpath
+.project
+.settings
+workspace

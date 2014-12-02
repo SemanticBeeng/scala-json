@@ -3,6 +3,9 @@
  */
 package play.api.libs.json
 
+import org.junit.runner._
+import org.specs2.runner._
+
 import org.specs2.mutable._
 import play.api.libs.json._
 import play.api.libs.json.Json._
@@ -14,6 +17,7 @@ import play.api.libs.json.util._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
+@RunWith(classOf[JUnitRunner])
 object JsonTransSpec extends Specification {
   "JSON transformers " should {
     val js = Json.obj(

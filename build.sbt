@@ -11,12 +11,13 @@ resolvers ++= Seq(
   //	"Mandubian repository releases" at "https://github.com/mandubian/mandubian-mvn/raw/master/releases/",
   //	"Mandubian repository snapshots" at "https://github.com/mandubian/mandubian-mvn/raw/master/snapshots/",
   //	"Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
-  Resolver.sonatypeRepo("snapshots"),
-  Resolver.sonatypeRepo("releases"),
- "bintray" at "http://dl.bintray.com/scalaz/releases"
+  //Resolver.sonatypeRepo("snapshots"),
+  //  Resolver.sonatypeRepo("releases"),
+ "bintray" at "http://dl.bintray.com/scalaz/releases",
  // "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
  // "releases" at "http://oss.sonatype.org/content/repositories/releases",
- // "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+ "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+  Resolver.sonatypeRepo("snapshots")
 )
 
 libraryDependencies ++= Seq(

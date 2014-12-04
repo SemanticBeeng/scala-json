@@ -1,7 +1,6 @@
 package com.playframework.play21
 
 import play.api.data.validation.ValidationError
-import play.api.libs.functional.FunctionalBuilder
 import play.api.libs.functional.syntax._
 //import play.api.libs.json.Reads._
 import play.api.libs.json._
@@ -38,8 +37,12 @@ object CreditCard {
     }
 
     def reads(js: JsValue): JsResult[String] = {
-      val number = (js \ "number").as[String].trim
+      val number = (js \ "number").validate[String].get.trim
       val cvv = (js \ "security").as[String].trim
+//      val value: JsValue = js \ "number"
+//      val result: JsResult[String] = value.validate[String]
+//      val number = result.get.trim
+//      val cvv = (js \ "security").validate[String].get.trim
 
       val expectedLength = lengthOfSecurityCode(number)
       val actualLength = cvv.length
@@ -52,44 +55,51 @@ object CreditCard {
     }
   }
 
-  // to avoid compile error
+//  // to avoid compile error
+//
+//  private val reads1: Reads[String] = new Reads[String] {
+//
+//    import play.api.libs.json.Reads._
+//    override def reads(js: JsValue): JsResult[String] = {
+//      val value: JsValue = at(js \ "service")(minLength[String](4));
+//      val result: JsResult[String] = value.validate[String](minLength[String](4))
+//      print(result)
+//      result
+//    }
+//  }
+//
+//
+//
+//  private val reads2: Reads[String] = new Reads[String] {
+//    override def reads(js: JsValue): JsResult[String] = {
+//
+//      val result: JsResult[String] = (js \ "number").validate[String](creditCardNumberReads)
+//      print(result)
+//      result
+//    }
+//  }
+//
+//  private val read3: Reads[String] = new Reads[String] {
+//    override def reads(js: JsValue): JsResult[String] = {
+//
+//      val result1 = js.validate(securityCodeLengthReads)
+//      val result = js.validate[String](securityCodeLengthReads)
+//      print(result)
+//      result
+//
+//    }
+//  }
+//
+//  private val build: FunctionalBuilder[Reads]#CanBuild3[String, String, String] =
+//    reads1 and reads2 and read3
+//
+//  implicit val paymentReads: Reads[CreditCard] = build(CreditCard.apply _)
+
   import play.api.libs.json.Reads.minLength
-
-  private val reads1: Reads[String] = new Reads[String] {
-    override def reads(js: JsValue): JsResult[String] = {
-
-      val value: JsValue = js \ "service"
-      val result: JsResult[String] = value.validate[String](minLength[String](4))
-      print(result)
-      result
-    }
-  }
-
-
-
-  private val reads2: Reads[String] = new Reads[String] {
-    override def reads(js: JsValue): JsResult[String] = {
-
-      val result: JsResult[String] = (js \ "number").validate[String](creditCardNumberReads)
-      print(result)
-      result
-    }
-  }
-
-  private val read3: Reads[String] = new Reads[String] {
-    override def reads(js: JsValue): JsResult[String] = {
-
-      val result1 = js.validate(securityCodeLengthReads)
-      val result = js.validate[String](securityCodeLengthReads)
-      print(result)
-      result
-
-    }
-  }
-
-  private val build: FunctionalBuilder[Reads]#CanBuild3[String, String, String] =
-    reads1 and reads2 and read3
-
-  implicit val paymentReads: Reads[CreditCard] = build(CreditCard.apply _)
+  implicit val paymentReads: Reads[CreditCard] = (
+    (__ \ 'service).read[String](minLength[String](4)) and
+      (__ \ 'number).read[String](creditCardNumberReads) and
+      (__ \ 'security).read[String](minLength[String](3))
+    )(CreditCard.apply _)
 
 }

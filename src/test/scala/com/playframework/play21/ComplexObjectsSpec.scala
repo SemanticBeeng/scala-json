@@ -1,64 +1,16 @@
 package com.playframework.play21
 
-;
-
 import org.junit.runner.RunWith
 import org.specs2.mutable._
 import org.specs2.runner.JUnitRunner
 import play.api.libs.json._
+import com.playframework.play21.Model4Test._
 
 /**
  *
  */
 @RunWith(classOf[JUnitRunner])
 class ComplexObjectsSpec extends Specification {
-
-  sealed trait Permission
-
-  case object AdminPermission extends Permission
-
-  case object UserPermission extends Permission
-
-  object Permission {
-
-    implicit val permFormat = Json.format[Permission]
-
-    def apply(num: Int): Permission = num match {
-      case 0 => AdminPermission
-      case _ => UserPermission
-    }
-
-    def unapply(p: Permission): Option[Int] = p match {
-      case AdminPermission => Some(0)
-      case UserPermission => Some(1)
-    }
-  }
-
-  case class Department(name: String)
-
-  object Department {
-    implicit val depFormat = Json.format[Department]
-
-  }
-
-  case class Inventory(name: String, inventoryType: String, department: Department)
-
-  object Inventory {
-    implicit val invFormat = Json.format[Inventory]
-  }
-
-  case class AppUser(
-                      id: Option[Long] = None,
-                      name: String,
-                      permission: Permission = UserPermission,
-                      department: Department
-                      )
-
-  object AppUser {
-
-    implicit val userFormat = Json.format[AppUser]
-
-  }
 
 
   /**
@@ -70,22 +22,26 @@ class ComplexObjectsSpec extends Specification {
     /**
      * ---------------------------
      */
-    "write complex types" in {
+    "read and write complex types" in {
 
       val user1 = AppUser(Some(1223424), "Joe Smith", AdminPermission, Department("tech"))
 
       val js = Json.toJson(user1)
 
       js.validate[AppUser] must equalTo(JsSuccess(user1))
+    }
 
-      //      {
-      //        val js = Json.toJson(AdminPermission)
-      //
-      //        js.validate[Permission] must equalTo(JsSuccess(AdminPermission))
-      //      }
+    /**
+     * ---------------------------
+     */
+    "read and write complex types with lists" in {
 
-      //      {
-      //      }
+      val user1 = AppUser(Some(1223424), "Joe Smith", AdminPermission, Department("tech"))
+      val company = Company("M & N", Some(user1), List(Department("tech"), Department("prod"), Department("hr")))
+
+      val js = Json.toJson(company)
+
+      js.validate[Company] must equalTo(JsSuccess(company))
     }
   }
 }

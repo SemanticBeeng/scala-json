@@ -72,7 +72,31 @@ class ComplexObjectsSpec extends Specification {
     Json.fromJson[ListContainer](js).get must equalTo(container)
   }
 
-//  /**
+  /**
+   * ---------------------------
+   */
+  "read and write lists of non primitive types " in {
+
+    val container = PhoneList(List(PhoneNumber("415", "384858")))
+
+    val js = Json.toJson(container)
+
+    Json.fromJson[PhoneList](js).get must equalTo(container)
+  }
+
+  /**
+   * ---------------------------
+   */
+  "read and write lists of non primitive types with custom list reader " in {
+
+    val container = PhoneList2(List(PhoneNumber("415", "384858")))
+
+    val js = Json.toJson(container)
+
+    Json.fromJson[PhoneList2](js).get must equalTo(container)
+  }
+
+  //  /**
 //   * ---------------------------
 //   */
 //  "read and write lists of polymorphic types " in {

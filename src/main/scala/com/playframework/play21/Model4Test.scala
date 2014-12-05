@@ -31,6 +31,12 @@ object Model4Test {
     }
   }
 
+  case class PhoneNumber(prefix: String, number: String)
+
+  object PhoneNumber {
+    implicit val format = Json.format[PhoneNumber];
+  }
+
   object Department {
     implicit val depFormat = Json.format[Department]
 
@@ -101,50 +107,69 @@ object Model4Test {
     implicit val format = Json.format[ListContainer]
   }
 
-//  trait Animal
-//
-//  case class Horse(name: String) extends Animal
-//
-//  case class Fish(weight: Double) extends Animal
-//
-//  case class Animals(animals: List[Horse])
-//
-//  object Horse {
-//    implicit val format = Json.format[Horse]
-//  }
-//
-//  object Fish {
-//    implicit val format = Json.format[Fish]
-//  }
-//
-//  object Animals {
-//
-//    implicit val animalsReads: Reads[Animals] = (
-//      (__ \ "animals").read(Reads.list[Horse](animalReads))
-//      )(Animals.apply _)
-//
-//    implicit val animalsWrites: Writes[Animals] = (
-//      (__ \ "animals").write(Writes.list[Horse](animalWrites))
-//      )(unlift(Animals.unapply))
-//
-//
-//  }
-//
-//  implicit object animalReads extends Reads[Horse] {
-//
-//    override def reads(j: JsValue): JsResult[Horse] = ???
-////    j match {
-////      case h: Horse => Json.reads[Horse].reads(h)
-////      case f: Fish => Json.reads[Fish].reads(f)
-////    }
-//  }
-//
-//  implicit object animalWrites extends Writes[Horse] {
-//    override def writes(o: Horse): JsValue = o match {
-//      case h: Horse => Json.writes[Horse].writes(h)
-//      case f: Fish => Json.writes[Fish].writes(f)
-//    }
-//  }
+  case class PhoneList(items: List[PhoneNumber])
+
+  object PhoneList {
+    implicit val format = Json.format[PhoneList]
+  }
+
+  case class PhoneList2(items: List[PhoneNumber])
+
+  object PhoneList2 {
+    implicit val phoneListW2rites = Json.writes[PhoneList2]
+
+    implicit object phoneList2Reads extends Reads[PhoneList2] {
+
+      override def reads(json: JsValue): JsResult[PhoneList2] = {
+        val read: Reads[List[PhoneNumber]] = (__ \ "items").read(Reads.list[PhoneNumber](Json.reads[PhoneNumber]))
+        JsSuccess(PhoneList2(read.reads(json).get))
+      }
+    }
+
+  }
+
+  //  trait Animal
+  //
+  //  case class Horse(name: String) /*extends Animal*/
+  //
+  //  //case class Fish(weight: Double) extends Animal
+  //
+  //  case class Animals(animals: List[Horse])
+  //
+  //  object Horse {
+  //    implicit val format = Json.format[Horse]
+  //  }
+  //
+  ////  object Fish {
+  ////    implicit val format = Json.format[Fish]
+  ////  }
+  //
+  //  object Animals {
+  //
+  //    implicit val animalsReads: Reads[Animals] = (
+  //      (__ \ "animals").read(Reads.list[Horse](Json.reads[Horse]))
+  //      )(Animals.apply _)
+  //
+  //    implicit val animalsWrites: Writes[Animals] = (
+  //      (__ \ "animals").write(Writes.list[Horse](Json.writes[Horse]))
+  //      )(unlift(Animals.unapply))
+  //  }
+
+  //  implicit object animalReads extends Reads[Horse] {
+  //
+  //    override def reads(j: JsValue): JsResult[Horse] = ???
+  ////    j match {
+  ////      case h: Horse => Json.reads[Horse].reads(h)
+  ////      case f: Fish => Json.reads[Fish].reads(f)
+  ////    }
+  //  }
+  //
+  //  implicit object animalWrites extends Writes[Horse] {
+  //    override def writes(o: Horse): JsValue = o match {
+  //      case h: Horse => Json.writes[Horse].writes(h)
+  //      case f: Fish => Json.writes[Fish].writes(f)
+  //    }
+  //  }
 
 
 }

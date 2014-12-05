@@ -1,15 +1,10 @@
 package com.playframework.play21
 
+import com.playframework.play21.Model4Test.PhoneNumber
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
-
-case class PhoneNumber(prefix: String, number: String)
-
-object PhoneNumber {
-  implicit val format = Json.format[PhoneNumber];
-}
 
 case class ComplexCreature(
   name: String,
@@ -54,7 +49,7 @@ object ComplexCreature {
         (__ \ "number").write[Int] tupled
     ) and
       (__ \ "friends").lazyWrite(Writes.traversableWrites[ComplexCreature](complexCreatureWrites)) and
-      (__ \ "phoneNumbers").lazyWrite(Writes.list[PhoneNumber](Json.writes[PhoneNumber])) and
+      (__ \ "phoneNumbers").write(Writes.list[PhoneNumber](Json.writes[PhoneNumber])) and
       (__ \ "social").writeOpt[String] //@todo writeOpt??
   )(unlift(ComplexCreature.unapply))
 

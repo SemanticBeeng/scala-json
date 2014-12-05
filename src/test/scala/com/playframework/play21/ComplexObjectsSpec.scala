@@ -82,14 +82,14 @@ class ComplexObjectsSpec extends Specification {
     val js = Json.toJson(container)
 
     Json.fromJson[PhoneList](js).get must equalTo(container)
-  }
+  } 
 
   /**
    * ---------------------------
    */
   "read and write lists of non primitive types with custom list reader " in {
 
-    val container = PhoneList2(List(PhoneNumber("415", "384858")))
+    val container = PhoneList2("personal", List(PhoneNumber("415", "384858")))
 
     val js = Json.toJson(container)
 

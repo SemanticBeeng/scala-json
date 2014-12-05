@@ -1,5 +1,7 @@
 package com.playframework.play21
 
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
 import play.api.libs.json._
 
 /**
@@ -107,24 +109,30 @@ object Model4Test {
     implicit val format = Json.format[ListContainer]
   }
 
-  case class PhoneList(items: List[PhoneNumber])
+  case class PhoneList(
+                        phoneNumbers: List[PhoneNumber]
+                        )
 
   object PhoneList {
     implicit val format = Json.format[PhoneList]
   }
 
-  case class PhoneList2(items: List[PhoneNumber])
+  case class PhoneList2(
+                         name: String,
+                         phoneNumbers: List[PhoneNumber]
+                         )
 
   object PhoneList2 {
-    implicit val phoneListW2rites = Json.writes[PhoneList2]
 
-    implicit object phoneList2Reads extends Reads[PhoneList2] {
+    implicit val pleads: Reads[PhoneList2] = (
+      (__ \ "name").read[String] and
+        (__ \ "phoneNumbers").read(Reads.list[PhoneNumber](Json.reads[PhoneNumber]))
+      )(PhoneList2.apply _)
 
-      override def reads(json: JsValue): JsResult[PhoneList2] = {
-        val read: Reads[List[PhoneNumber]] = (__ \ "items").read(Reads.list[PhoneNumber](Json.reads[PhoneNumber]))
-        JsSuccess(PhoneList2(read.reads(json).get))
-      }
-    }
+    implicit val plWrites: Writes[PhoneList2] = (
+      (__ \ "name").write[String] and
+        (__ \ "phoneNumbers").write(Writes.list[PhoneNumber](Json.writes[PhoneNumber]))
+      )(unlift(PhoneList2.unapply))
 
   }
 

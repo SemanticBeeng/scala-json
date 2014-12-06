@@ -82,7 +82,7 @@ class ComplexObjectsSpec extends Specification {
     val js = Json.toJson(container)
 
     Json.fromJson[PhoneList](js).get must equalTo(container)
-  } 
+  }
 
   /**
    * ---------------------------
@@ -96,16 +96,18 @@ class ComplexObjectsSpec extends Specification {
     Json.fromJson[PhoneList2](js).get must equalTo(container)
   }
 
-  //  /**
+//    /**
 //   * ---------------------------
 //   */
 //  "read and write lists of polymorphic types " in {
 //
-//    val animals = Animals(List(Horse("Spirit"), Horse("Baker")))
+//    val animals = Animals("myfarm", List(Horse("Spirit"), Fish(2)))
 //
 //    val js = Json.toJson(animals)
 //
-//    Json.fromJson[Animals](js).get must equalTo(animals)
+//    println(js)
+//    success
+//    //Json.fromJson[Animals](js).get must equalTo(animals)
 //  }
 
 }

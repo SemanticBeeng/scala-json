@@ -1,10 +1,11 @@
 package com.playframework.play21
 
+import com.json.variants.Variants
+import com.playframework.play21.Model4Test._
 import org.junit.runner.RunWith
 import org.specs2.mutable._
 import org.specs2.runner.JUnitRunner
 import play.api.libs.json._
-import com.playframework.play21.Model4Test._
 
 /**
  *
@@ -96,18 +97,32 @@ class ComplexObjectsSpec extends Specification {
     Json.fromJson[PhoneList2](js).get must equalTo(container)
   }
 
-//    /**
-//   * ---------------------------
-//   */
-//  "read and write lists of polymorphic types " in {
-//
-//    val animals = Animals("myfarm", List(Horse("Spirit"), Fish(2)))
-//
-//    val js = Json.toJson(animals)
-//
-//    println(js)
-//    success
-//    //Json.fromJson[Animals](js).get must equalTo(animals)
-//  }
+  "Handle heregorenous lists" in {
+
+    val contacts = List[Contact](EmailAddress("joe@smith.com"), PhoneNumber("415", "12345"))
+
+    implicit val emailVariantFormat: Format[EmailAddress] = Variants.format[EmailAddress]
+    implicit val phoneVariantFormat: Format[PhoneNumber] = Variants.format[PhoneNumber]
+
+    //@todo: write custom serializer for lists containing variants
+    val json: JsValue = Json.toJson(contacts)
+    val print: String = Json.prettyPrint(json)
+    println(print)
+    success
+  }
+
+  //    /**
+  //   * ---------------------------
+  //   */
+  //  "read and write lists of polymorphic types " in {
+  //
+  //    val animals = Animals("myfarm", List(Horse("Spirit"), Fish(2)))
+  //
+  //    val js = Json.toJson(animals)
+  //
+  //    println(js)
+  //    success
+  //    //Json.fromJson[Animals](js).get must equalTo(animals)
+  //  }
 
 }

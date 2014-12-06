@@ -3,7 +3,6 @@ package com.variants
 import com.json.variants.Variants
 import org.specs2.mutable.Specification
 import play.api.libs.json.{Json,Format}
-import com.playframework.play21.Model4Test._
 
 object VariantsSpec extends Specification {
 
@@ -77,14 +76,6 @@ object VariantsSpec extends Specification {
       implicit val writes = Variants.writes[A]
       Json.toJson(B(42)) must equalTo(Json.obj("x" -> 42, "$variant" -> "B"))
       Json.toJson(C(0)) must equalTo(Json.obj("x" -> 0, "$variant" -> "C"))
-    }
-
-    "Handle heregorenous lists" in {
-
-      val contacts = List[Contact](EmailAddress("joe@smith.com"), PhoneNumber("415", "12345"))
-
-      //Json.toJson(contacts)
-      success
     }
   }
 }

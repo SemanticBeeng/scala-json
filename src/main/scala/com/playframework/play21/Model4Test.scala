@@ -1,7 +1,7 @@
 package com.playframework.play21
 
-import com.json.variants.Variants
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Json._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
@@ -40,7 +40,7 @@ object Model4Test {
 
   object PhoneNumber {
     implicit val format = Json.format[PhoneNumber]
-    implicit val variantFormat: Format[PhoneNumber] = Variants.format[PhoneNumber]
+    //implicit val variantFormat: Format[PhoneNumber] = Variants.format[PhoneNumber]
   }
 
   sealed case class EmailAddress(address: String) extends Contact
@@ -48,7 +48,7 @@ object Model4Test {
   object EmailAddress {
 
     implicit val format = Json.format[EmailAddress]
-    implicit val variantFormat: Format[EmailAddress] = Variants.format[EmailAddress]
+    //implicit val variantFormat: Format[EmailAddress] = Variants.format[EmailAddress]
   }
 
   object Department {
@@ -135,6 +135,23 @@ object Model4Test {
       )(unlift(PhoneList2.unapply))
 
   }
+
+  implicit val contactWrites  = new Writes[List[Contact]] {
+
+    def writes(as: List[Contact]) = JsArray(as.map(contactToJson).toList)
+
+    def contactToJson(c: Contact) : JsValue = {
+      //implicit val emailVariantFormat: Format[EmailAddress] = Variants.format[EmailAddress]
+      //implicit val phoneVariantFormat: Format[PhoneNumber] = Variants.format[PhoneNumber]
+
+      c match {
+        case c1: EmailAddress => toJson[EmailAddress](c1)
+        case c2: PhoneNumber => toJson[PhoneNumber](c2)
+      }
+    }
+
+  }
+
 
   trait Animal
 
